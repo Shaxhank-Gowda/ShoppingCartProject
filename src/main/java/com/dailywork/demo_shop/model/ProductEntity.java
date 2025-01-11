@@ -19,10 +19,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class ProductEntity {
+	
 	@Id
 	@GeneratedValue( strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -38,4 +38,17 @@ public class ProductEntity {
 	
 	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true )
 	private List<ImageEntity> images;
+
+	public ProductEntity(String brand, String name, BigDecimal price, int inventory, String description,
+			CategoryEntity category) {
+		super();
+		this.brand = brand;
+		this.name = name;
+		this.price = price;
+		this.inventory = inventory;
+		this.description = description;
+		this.category = category;
+	}
+	
+	
 }

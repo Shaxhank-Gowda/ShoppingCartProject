@@ -1,12 +1,16 @@
 package com.dailywork.demo_shop.service.product;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.dailywork.demo_shop.exceptions.ProductNotFoundExcception;
+import com.dailywork.demo_shop.model.CategoryEntity;
 import com.dailywork.demo_shop.model.ProductEntity;
+import com.dailywork.demo_shop.repository.CategoryRepository;
 import com.dailywork.demo_shop.repository.ProductRepository;
+import com.dailywork.demo_shop.request.AddProductRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,12 +20,29 @@ import lombok.RequiredArgsConstructor;
 public class ProductService implements IProductService {
 
 	private final ProductRepository productRepo;
+	private final CategoryRepository categoryRepo;
 	@Override
-	public ProductEntity addProduct(ProductEntity ProductEntity) {
-		// TODO Auto-generated method stub
-		return null;
+	public ProductEntity addProduct(AddProductRequest request) {
+				
+		CategoryEntity category = Optional.ofNullable(categoryRepo.findByName(request.getCategory().getName()))
+				.orElseGet(()-> {
+						CategoryEntity newCategory = new CategoryEntity(request.getCategory().getName());
+								return categoryRepo.save(newCategory);								
+				});
+		request.setCategory(category);
+		return productRepo.save(createProduct(request, category));
 	}
 
+	private ProductEntity createProduct(AddProductRequest req, CategoryEntity category) {		
+		return new ProductEntity(
+				req.getBrand(),
+				req.getName(),
+				req.getPrice(),
+				req.getInventory(),
+				req.getDescription(),
+				category);		
+	}
+	
 	@Override
 	public ProductEntity getProductById(Long id) {
 		return productRepo.findById(id)
@@ -39,6 +60,8 @@ public class ProductService implements IProductService {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	private ProductEntity updateExistingProduct(ProductEntity)
 
 	@Override
 	public List<ProductEntity> getAllProducts() {
